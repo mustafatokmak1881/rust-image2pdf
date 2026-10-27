@@ -16,7 +16,7 @@ fn convert_images_to_pdf(image_paths: Vec<String>, output_path: String) -> Resul
     let page_h = Mm(297.0);
 
     // Create document with first page (A4)
-    let (doc, page1, layer1) = PdfDocument::new(
+    let (mut doc, page1, layer1) = PdfDocument::new(
         "Image to PDF",
         page_w,
         page_h,
@@ -24,7 +24,6 @@ fn convert_images_to_pdf(image_paths: Vec<String>, output_path: String) -> Resul
     );
 
     let mut is_first = true;
-    let mut doc = doc;
 
     for path_str in &image_paths {
         let path = Path::new(path_str);
@@ -50,14 +49,13 @@ fn convert_images_to_pdf(image_paths: Vec<String>, output_path: String) -> Resul
         let current_layer = doc.get_page(page).get_layer(layer);
 
         // Fit image to the full page while preserving aspect ratio (allow upscaling)
-        // printpdf default is 300 DPI → 1 px ≈ 0.084666 mm (25.4 / 300)
         let px_to_mm = 25.4 / 300.0;
         let img_w_mm = img_w as f32 * px_to_mm;
         let img_h_mm = img_h as f32 * px_to_mm;
 
         let scale_w = page_w.0 / img_w_mm;
         let scale_h = page_h.0 / img_h_mm;
-        let scale = scale_w.min(scale_h); // fit inside page, no .min(1.0)
+        let scale = scale_w.min(scale_h);
 
         let scaled_w = img_w_mm * scale;
         let scaled_h = img_h_mm * scale;
