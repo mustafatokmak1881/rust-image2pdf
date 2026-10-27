@@ -2,7 +2,8 @@ use printpdf::*;
 use std::fs::File;
 use std::io::BufWriter;
 use std::path::Path;
-use image::io::Reader as ImageReader;
+use ::image::io::Reader as ImageReader;
+use ::image::GenericImageView;
 
 #[tauri::command]
 fn convert_images_to_pdf(image_paths: Vec<String>, output_path: String) -> Result<String, String> {
