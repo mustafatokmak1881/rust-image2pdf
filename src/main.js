@@ -80,7 +80,7 @@ convertBtn.addEventListener("click", async () => {
 
     const output = await save({
       filters: [{ name: "PDF", extensions: ["pdf"] }],
-      defaultPath: "images.pdf",
+      defaultPath: "pdfdosyam.pdf",
     });
 
     if (!output) {
