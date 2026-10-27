@@ -1,1 +1,107 @@
-data=const+%7B+invoke+%7D+%3D+window.__TAURI__.core%3B%0Aconst+%7B+open%2C+save+%7D+%3D+window.__TAURI__.dialog%3B%0A%0Alet+selectedPaths+%3D+%5B%5D%3B%0A%0Aconst+selectBtn+%3D+document.getElementById%28%22select-btn%22%29%3B%0Aconst+convertBtn+%3D+document.getElementById%28%22convert-btn%22%29%3B%0Aconst+clearBtn+%3D+document.getElementById%28%22clear-btn%22%29%3B%0Aconst+preview+%3D+document.getElementById%28%22preview%22%29%3B%0Aconst+statusEl+%3D+document.getElementById%28%22status%22%29%3B%0A%0Afunction+setStatus%28msg%2C+isError+%3D+false%29+%7B%0A++statusEl.textContent+%3D+msg%3B%0A++statusEl.className+%3D+%22status+%22+%2B+%28isError+%3F+%22error%22+%3A+%22success%22%29%3B%0A%7D%0A%0Afunction+updateUI%28%29+%7B%0A++const+hasFiles+%3D+selectedPaths.length+%3E+0%3B%0A++convertBtn.disabled+%3D+%21hasFiles%3B%0A++clearBtn.disabled+%3D+%21hasFiles%3B%0A%0A++if+%28%21hasFiles%29+%7B%0A++++preview.innerHTML+%3D+%60%3Cp+class%3D%22empty%22%3EHen%C3%BCz+resim+se%C3%A7ilmedi%3C%2Fp%3E%60%3B%0A++++return%3B%0A++%7D%0A%0A++preview.innerHTML+%3D+selectedPaths%0A++++.map%28%28p%2C+i%29+%3D%3E+%7B%0A++++++const+name+%3D+p.split%28%2F%5B%5C%5C%2F%5D%2F%29.pop%28%29%3B%0A++++++return+%60%3Cdiv+class%3D%22file-item%22%3E%0A++++++++%3Cspan+class%3D%22index%22%3E%24%7Bi+%2B+1%7D.%3C%2Fspan%3E%0A++++++++%3Cspan+class%3D%22name%22+title%3D%22%24%7Bp%7D%22%3E%24%7Bname%7D%3C%2Fspan%3E%0A++++++%3C%2Fdiv%3E%60%3B%0A++++%7D%29%0A++++.join%28%22%22%29%3B%0A%7D%0A%0AselectBtn.addEventListener%28%22click%22%2C+async+%28%29+%3D%3E+%7B%0A++try+%7B%0A++++const+files+%3D+await+open%28%7B%0A++++++multiple%3A+true%2C%0A++++++filters%3A+%5B%0A++++++++%7B%0A++++++++++name%3A+%22Images%22%2C%0A++++++++++extensions%3A+%5B%22png%22%2C+%22jpg%22%2C+%22jpeg%22%2C+%22gif%22%2C+%22bmp%22%2C+%22webp%22%2C+%22tiff%22%2C+%22tif%22%5D%2C%0A++++++++%7D%2C%0A++++++%5D%2C%0A++++%7D%29%3B%0A%0A++++if+%28files+%3D%3D%3D+null%29+return%3B+%2F%2F+user+cancelled%0A%0A++++%2F%2F+files+can+be+string+or+string%5B%5D%0A++++if+%28Array.isArray%28files%29%29+%7B%0A++++++selectedPaths+%3D+%5B...selectedPaths%2C+...files%5D%3B%0A++++%7D+else+if+%28typeof+files+%3D%3D%3D+%22string%22%29+%7B%0A++++++selectedPaths.push%28files%29%3B%0A++++%7D%0A%0A++++%2F%2F+dedupe%0A++++selectedPaths+%3D+%5B...new+Set%28selectedPaths%29%5D%3B%0A++++updateUI%28%29%3B%0A++++setStatus%28%60%24%7BselectedPaths.length%7D+resim+se%C3%A7ildi%60%29%3B%0A++%7D+catch+%28err%29+%7B%0A++++setStatus%28%22Se%C3%A7im+hatas%C4%B1%3A+%22+%2B+err%2C+true%29%3B%0A++%7D%0A%7D%29%3B%0A%0AclearBtn.addEventListener%28%22click%22%2C+%28%29+%3D%3E+%7B%0A++selectedPaths+%3D+%5B%5D%3B%0A++updateUI%28%29%3B%0A++setStatus%28%22%22%29%3B%0A%7D%29%3B%0A%0AconvertBtn.addEventListener%28%22click%22%2C+async+%28%29+%3D%3E+%7B%0A++if+%28selectedPaths.length+%3D%3D%3D+0%29+return%3B%0A%0A++try+%7B%0A++++convertBtn.disabled+%3D+true%3B%0A++++setStatus%28%22PDF+olu%C5%9Fturuluyor...%22%29%3B%0A%0A++++const+output+%3D+await+save%28%7B%0A++++++filters%3A+%5B%7B+name%3A+%22PDF%22%2C+extensions%3A+%5B%22pdf%22%5D+%7D%5D%2C%0A++++++defaultPath%3A+%22images.pdf%22%2C%0A++++%7D%29%3B%0A%0A++++if+%28%21output%29+%7B%0A++++++setStatus%28%22Kaydetme+iptal+edildi%22%29%3B%0A++++++convertBtn.disabled+%3D+false%3B%0A++++++return%3B%0A++++%7D%0A%0A++++const+result+%3D+await+invoke%28%22convert_images_to_pdf%22%2C+%7B%0A++++++imagePaths%3A+selectedPaths%2C%0A++++++outputPath%3A+output%2C%0A++++%7D%29%3B%0A%0A++++setStatus%28result%29%3B%0A++%7D+catch+%28err%29+%7B%0A++++setStatus%28%22Hata%3A+%22+%2B+%28err%3F.message+%7C%7C+err%29%2C+true%29%3B%0A++%7D+finally+%7B%0A++++convertBtn.disabled+%3D+selectedPaths.length+%3D%3D%3D+0%3B%0A++%7D%0A%7D%29%3B%0A%0Awindow.addEventListener%28%22DOMContentLoaded%22%2C+%28%29+%3D%3E+%7B%0A++updateUI%28%29%3B%0A%7D%29%3B%0A
+const { invoke } = window.__TAURI__.core;
+const { open, save } = window.__TAURI__.dialog;
+
+let selectedPaths = [];
+
+const selectBtn = document.getElementById("select-btn");
+const convertBtn = document.getElementById("convert-btn");
+const clearBtn = document.getElementById("clear-btn");
+const preview = document.getElementById("preview");
+const statusEl = document.getElementById("status");
+
+function setStatus(msg, isError = false) {
+  statusEl.textContent = msg;
+  statusEl.className = "status " + (isError ? "error" : "success");
+}
+
+function updateUI() {
+  const hasFiles = selectedPaths.length > 0;
+  convertBtn.disabled = !hasFiles;
+  clearBtn.disabled = !hasFiles;
+
+  if (!hasFiles) {
+    preview.innerHTML = `<p class="empty">Henüz resim seçilmedi</p>`;
+    return;
+  }
+
+  preview.innerHTML = selectedPaths
+    .map((p, i) => {
+      const name = p.split(/[\\/]/).pop();
+      return `<div class="file-item">
+        <span class="index">${i + 1}.</span>
+        <span class="name" title="${p}">${name}</span>
+      </div>`;
+    })
+    .join("");
+}
+
+selectBtn.addEventListener("click", async () => {
+  try {
+    const files = await open({
+      multiple: true,
+      filters: [
+        {
+          name: "Images",
+          extensions: ["png", "jpg", "jpeg", "gif", "bmp", "webp", "tiff", "tif"],
+        },
+      ],
+    });
+
+    if (files === null) return; // user cancelled
+
+    // files can be string or string[]
+    if (Array.isArray(files)) {
+      selectedPaths = [...selectedPaths, ...files];
+    } else if (typeof files === "string") {
+      selectedPaths.push(files);
+    }
+
+    // dedupe
+    selectedPaths = [...new Set(selectedPaths)];
+    updateUI();
+    setStatus(`${selectedPaths.length} resim seçildi`);
+  } catch (err) {
+    setStatus("Seçim hatası: " + err, true);
+  }
+});
+
+clearBtn.addEventListener("click", () => {
+  selectedPaths = [];
+  updateUI();
+  setStatus("");
+});
+
+convertBtn.addEventListener("click", async () => {
+  if (selectedPaths.length === 0) return;
+
+  try {
+    convertBtn.disabled = true;
+    setStatus("PDF oluşturuluyor...");
+
+    const output = await save({
+      filters: [{ name: "PDF", extensions: ["pdf"] }],
+      defaultPath: "images.pdf",
+    });
+
+    if (!output) {
+      setStatus("Kaydetme iptal edildi");
+      convertBtn.disabled = false;
+      return;
+    }
+
+    const result = await invoke("convert_images_to_pdf", {
+      imagePaths: selectedPaths,
+      outputPath: output,
+    });
+
+    setStatus(result);
+  } catch (err) {
+    setStatus("Hata: " + (err?.message || err), true);
+  } finally {
+    convertBtn.disabled = selectedPaths.length === 0;
+  }
+});
+
+window.addEventListener("DOMContentLoaded", () => {
+  updateUI();
+});

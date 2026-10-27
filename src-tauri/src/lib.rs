@@ -1,1 +1,83 @@
-data=use+printpdf%3A%3A%2A%3B%0Ause+std%3A%3Afs%3A%3AFile%3B%0Ause+std%3A%3Aio%3A%3ABufWriter%3B%0Ause+std%3A%3Apath%3A%3APath%3B%0A%0A%23%5Btauri%3A%3Acommand%5D%0Afn+convert_images_to_pdf%28image_paths%3A+Vec%3CString%3E%2C+output_path%3A+String%29+-%3E+Result%3CString%2C+String%3E+%7B%0A++++if+image_paths.is_empty%28%29+%7B%0A++++++++return+Err%28%22No+images+selected%22.to_string%28%29%29%3B%0A++++%7D%0A%0A++++%2F%2F+Create+document+with+first+page+%28A4%29%0A++++let+%28mut+doc%2C+page1%2C+layer1%29+%3D+PdfDocument%3A%3Anew%28%0A++++++++%22Image+to+PDF%22%2C%0A++++++++Mm%28210.0%29%2C%0A++++++++Mm%28297.0%29%2C%0A++++++++%22Layer+1%22%2C%0A++++%29%3B%0A%0A++++let+mut+is_first+%3D+true%3B%0A%0A++++for+path_str+in+%26image_paths+%7B%0A++++++++let+path+%3D+Path%3A%3Anew%28path_str%29%3B%0A++++++++if+%21path.exists%28%29+%7B%0A++++++++++++return+Err%28format%21%28%22File+not+found%3A+%7B%7D%22%2C+path_str%29%29%3B%0A++++++++%7D%0A%0A++++++++let+dyn_img+%3D+image%3A%3Aopen%28path%29%0A++++++++++++.map_err%28%7Ce%7C+format%21%28%22Failed+to+open+image+%7B%7D%3A+%7B%7D%22%2C+path_str%2C+e%29%29%3F%3B%0A%0A++++++++let+%28img_w%2C+img_h%29+%3D+dyn_img.dimensions%28%29%3B%0A++++++++let+pdf_image+%3D+Image%3A%3Afrom_dynamic_image%28%26dyn_img%29%3B%0A%0A++++++++let+%28page%2C+layer%29+%3D+if+is_first+%7B%0A++++++++++++is_first+%3D+false%3B%0A++++++++++++%28page1%2C+layer1%29%0A++++++++%7D+else+%7B%0A++++++++++++doc.add_page%28Mm%28210.0%29%2C+Mm%28297.0%29%2C+%22Layer+1%22%29%0A++++++++%7D%3B%0A%0A++++++++let+current_layer+%3D+doc.get_page%28page%29.get_layer%28layer%29%3B%0A%0A++++++++%2F%2F+Scale+to+fit+A4+while+preserving+aspect+ratio+%28300+DPI+base%29%0A++++++++let+img_w_mm+%3D+%28img_w+as+f32%29+%2A+25.4+%2F+300.0%3B%0A++++++++let+img_h_mm+%3D+%28img_h+as+f32%29+%2A+25.4+%2F+300.0%3B%0A++++++++let+scale+%3D+%28210.0+%2F+img_w_mm%29.min%28297.0+%2F+img_h_mm%29.min%281.0%29%3B%0A%0A++++++++let+scaled_w+%3D+img_w_mm+%2A+scale%3B%0A++++++++let+scaled_h+%3D+img_h_mm+%2A+scale%3B%0A++++++++let+x+%3D+%28210.0+-+scaled_w%29+%2F+2.0%3B%0A++++++++let+y+%3D+%28297.0+-+scaled_h%29+%2F+2.0%3B%0A%0A++++++++pdf_image.add_to_layer%28%0A++++++++++++current_layer%2C%0A++++++++++++ImageTransform+%7B%0A++++++++++++++++translate_x%3A+Some%28Mm%28x%29%29%2C%0A++++++++++++++++translate_y%3A+Some%28Mm%28y%29%29%2C%0A++++++++++++++++scale_x%3A+Some%28scale%29%2C%0A++++++++++++++++scale_y%3A+Some%28scale%29%2C%0A++++++++++++++++..Default%3A%3Adefault%28%29%0A++++++++++++%7D%2C%0A++++++++%29%3B%0A++++%7D%0A%0A++++%2F%2F+Save+the+PDF%0A++++let+output+%3D+Path%3A%3Anew%28%26output_path%29%3B%0A++++let+file+%3D+File%3A%3Acreate%28output%29.map_err%28%7Ce%7C+format%21%28%22Cannot+create+output+file%3A+%7B%7D%22%2C+e%29%29%3F%3B%0A++++let+mut+buf_writer+%3D+BufWriter%3A%3Anew%28file%29%3B%0A++++doc.save%28%26mut+buf_writer%29%0A++++++++.map_err%28%7Ce%7C+format%21%28%22Failed+to+save+PDF%3A+%7B%7D%22%2C+e%29%29%3F%3B%0A%0A++++Ok%28format%21%28%22PDF+ba%C5%9Far%C4%B1yla+kaydedildi%3A+%7B%7D%22%2C+output_path%29%29%0A%7D%0A%0A%23%5Bcfg_attr%28mobile%2C+tauri%3A%3Amobile_entry_point%29%5D%0Apub+fn+run%28%29+%7B%0A++++tauri%3A%3ABuilder%3A%3Adefault%28%29%0A++++++++.plugin%28tauri_plugin_opener%3A%3Ainit%28%29%29%0A++++++++.plugin%28tauri_plugin_dialog%3A%3Ainit%28%29%29%0A++++++++.invoke_handler%28tauri%3A%3Agenerate_handler%21%5Bconvert_images_to_pdf%5D%29%0A++++++++.run%28tauri%3A%3Agenerate_context%21%28%29%29%0A++++++++.expect%28%22error+while+running+tauri+application%22%29%3B%0A%7D%0A
+use printpdf::*;
+use std::fs::File;
+use std::io::BufWriter;
+use std::path::Path;
+
+#[tauri::command]
+fn convert_images_to_pdf(image_paths: Vec<String>, output_path: String) -> Result<String, String> {
+    if image_paths.is_empty() {
+        return Err("No images selected".to_string());
+    }
+
+    // Create document with first page (A4)
+    let (mut doc, page1, layer1) = PdfDocument::new(
+        "Image to PDF",
+        Mm(210.0),
+        Mm(297.0),
+        "Layer 1",
+    );
+
+    let mut is_first = true;
+
+    for path_str in &image_paths {
+        let path = Path::new(path_str);
+        if !path.exists() {
+            return Err(format!("File not found: {}", path_str));
+        }
+
+        let dyn_img = image::open(path)
+            .map_err(|e| format!("Failed to open image {}: {}", path_str, e))?;
+
+        let (img_w, img_h) = dyn_img.dimensions();
+        let pdf_image = Image::from_dynamic_image(&dyn_img);
+
+        let (page, layer) = if is_first {
+            is_first = false;
+            (page1, layer1)
+        } else {
+            doc.add_page(Mm(210.0), Mm(297.0), "Layer 1")
+        };
+
+        let current_layer = doc.get_page(page).get_layer(layer);
+
+        // Scale to fit A4 while preserving aspect ratio (300 DPI base)
+        let img_w_mm = (img_w as f32) * 25.4 / 300.0;
+        let img_h_mm = (img_h as f32) * 25.4 / 300.0;
+        let scale = (210.0 / img_w_mm).min(297.0 / img_h_mm).min(1.0);
+
+        let scaled_w = img_w_mm * scale;
+        let scaled_h = img_h_mm * scale;
+        let x = (210.0 - scaled_w) / 2.0;
+        let y = (297.0 - scaled_h) / 2.0;
+
+        pdf_image.add_to_layer(
+            current_layer,
+            ImageTransform {
+                translate_x: Some(Mm(x)),
+                translate_y: Some(Mm(y)),
+                scale_x: Some(scale),
+                scale_y: Some(scale),
+                ..Default::default()
+            },
+        );
+    }
+
+    // Save the PDF
+    let output = Path::new(&output_path);
+    let file = File::create(output).map_err(|e| format!("Cannot create output file: {}", e))?;
+    let mut buf_writer = BufWriter::new(file);
+    doc.save(&mut buf_writer)
+        .map_err(|e| format!("Failed to save PDF: {}", e))?;
+
+    Ok(format!("PDF başarıyla kaydedildi: {}", output_path))
+}
+
+#[cfg_attr(mobile, tauri::mobile_entry_point)]
+pub fn run() {
+    tauri::Builder::default()
+        .plugin(tauri_plugin_opener::init())
+        .plugin(tauri_plugin_dialog::init())
+        .invoke_handler(tauri::generate_handler![convert_images_to_pdf])
+        .run(tauri::generate_context!())
+        .expect("error while running tauri application");
+}

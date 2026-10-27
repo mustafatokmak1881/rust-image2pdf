@@ -1,1 +1,29 @@
-data=%5Bpackage%5D%0Aname+%3D+%22image2pdf%22%0Aversion+%3D+%220.1.0%22%0Adescription+%3D+%22Convert+images+to+PDF%22%0Aauthors+%3D+%5B%22you%22%5D%0Aedition+%3D+%222021%22%0A%0A%5Blib%5D%0Aname+%3D+%22image2pdf_lib%22%0Acrate-type+%3D+%5B%22staticlib%22%2C+%22cdylib%22%2C+%22rlib%22%5D%0A%0A%5Bbuild-dependencies%5D%0Atauri-build+%3D+%7B+version+%3D+%222%22%2C+features+%3D+%5B%5D+%7D%0A%0A%5Bdependencies%5D%0Atauri+%3D+%7B+version+%3D+%222%22%2C+features+%3D+%5B%5D+%7D%0Atauri-plugin-opener+%3D+%222%22%0Atauri-plugin-dialog+%3D+%222%22%0Aserde+%3D+%7B+version+%3D+%221%22%2C+features+%3D+%5B%22derive%22%5D+%7D%0Aserde_json+%3D+%221%22%0Aimage+%3D+%220.24%22%0Aprintpdf+%3D+%220.7%22%0A%0A%5Bprofile.release%5D%0Acodegen-units+%3D+1%0Alto+%3D+true%0Aopt-level+%3D+3%0Apanic+%3D+%22abort%22%0Astrip+%3D+true%0A
+[package]
+name = "image2pdf"
+version = "0.1.0"
+description = "Convert images to PDF"
+authors = ["you"]
+edition = "2021"
+
+[lib]
+name = "image2pdf_lib"
+crate-type = ["staticlib", "cdylib", "rlib"]
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+tauri = { version = "2", features = [] }
+tauri-plugin-opener = "2"
+tauri-plugin-dialog = "2"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+image = "0.24"
+printpdf = "0.7"
+
+[profile.release]
+codegen-units = 1
+lto = true
+opt-level = 3
+panic = "abort"
+strip = true
