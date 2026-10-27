@@ -1,7 +1,1 @@
-# Tauri + Vanilla
-
-This template should help get you started developing with Tauri in vanilla HTML, CSS and Javascript.
-
-## Recommended IDE Setup
-
-- [VS Code](https://code.visualstudio.com/) + [Tauri](https://marketplace.visualstudio.com/items?itemName=tauri-apps.tauri-vscode) + [rust-analyzer](https://marketplace.visualstudio.com/items?itemName=rust-lang.rust-analyzer)
+data=%23+Image+to+PDF%0A%0ATauri+tabanl%C4%B1+basit+bir+masa%C3%BCst%C3%BC+uygulamas%C4%B1.+Birden+fazla+resmi+se%C3%A7ip+tek+bir+PDF+dosyas%C4%B1na+d%C3%B6n%C3%BC%C5%9Ft%C3%BCr%C3%BCr.%0A%0A%23%23+%C3%96zellikler%0A%0A-+%C3%87oklu+resim+se%C3%A7imi+%28PNG%2C+JPG%2C+JPEG%2C+GIF%2C+BMP%2C+WEBP%2C+TIFF%29%0A-+Her+resim+ayr%C4%B1+bir+PDF+sayfas%C4%B1na+yerle%C5%9Ftirilir+%28A4%29%0A-+Resimler+sayfaya+s%C4%B1%C4%9Facak+%C5%9Fekilde+%C3%B6l%C3%A7eklenir+%28en-boy+oran%C4%B1+korunur%29%0A-+Modern+ve+sade+aray%C3%BCz%0A%0A%23%23+Geli%C5%9Ftirme%0A%0A%60%60%60bash%0A%23+Ba%C4%9F%C4%B1ml%C4%B1l%C4%B1klar%C4%B1+y%C3%BCkle%0Acd+src-tauri%0Acargo+build%0A%0A%23+Uygulamay%C4%B1+%C3%A7al%C4%B1%C5%9Ft%C4%B1r+%28k%C3%B6k+dizinden%29%0Anpm+run+tauri+dev%0A%23+veya%0Acargo+tauri+dev%0A%60%60%60%0A%0A%23%23+Kullan%C4%B1m%0A%0A1.+%2A%2AResimleri+Se%C3%A7%2A%2A+butonuna+t%C4%B1klay%C4%B1n%0A2.+%C4%B0stedi%C4%9Finiz+resimleri+se%C3%A7in%0A3.+%2A%2APDF+Olu%C5%9Ftur%2A%2A+ile+kaydetme+konumunu+belirleyin%0A4.+PDF+olu%C5%9Fturulur%0A%0A%23%23+Teknolojiler%0A%0A-+Tauri+2%0A-+Rust+%28%60printpdf%60+%2B+%60image%60%29%0A-+Vanilla+HTML+%2F+CSS+%2F+JS%0A

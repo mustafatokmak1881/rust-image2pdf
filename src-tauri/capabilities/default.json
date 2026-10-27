@@ -1,10 +1,1 @@
-{
-  "$schema": "../gen/schemas/desktop-schema.json",
-  "identifier": "default",
-  "description": "Capability for the main window",
-  "windows": ["main"],
-  "permissions": [
-    "core:default",
-    "opener:default"
-  ]
-}
+data=%7B%0A++%22%24schema%22%3A+%22..%2Fgen%2Fschemas%2Fdesktop-schema.json%22%2C%0A++%22identifier%22%3A+%22default%22%2C%0A++%22description%22%3A+%22Capability+for+the+main+window%22%2C%0A++%22windows%22%3A+%5B%22main%22%5D%2C%0A++%22permissions%22%3A+%5B%0A++++%22core%3Adefault%22%2C%0A++++%22opener%3Adefault%22%2C%0A++++%22dialog%3Adefault%22%0A++%5D%0A%7D%0A
