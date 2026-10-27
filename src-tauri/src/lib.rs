@@ -2,6 +2,7 @@ use printpdf::*;
 use std::fs::File;
 use std::io::BufWriter;
 use std::path::Path;
+use image::io::Reader as ImageReader;
 
 #[tauri::command]
 fn convert_images_to_pdf(image_paths: Vec<String>, output_path: String) -> Result<String, String> {
@@ -25,8 +26,10 @@ fn convert_images_to_pdf(image_paths: Vec<String>, output_path: String) -> Resul
             return Err(format!("File not found: {}", path_str));
         }
 
-        let dyn_img = image::open(path)
-            .map_err(|e| format!("Failed to open image {}: {}", path_str, e))?;
+        let dyn_img = ImageReader::open(path)
+            .map_err(|e| format!("Failed to open image {}: {}", path_str, e))?
+            .decode()
+            .map_err(|e| format!("Failed to decode image {}: {}", path_str, e))?;
 
         let (img_w, img_h) = dyn_img.dimensions();
         let pdf_image = Image::from_dynamic_image(&dyn_img);
