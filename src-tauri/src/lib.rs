@@ -11,16 +11,20 @@ fn convert_images_to_pdf(image_paths: Vec<String>, output_path: String) -> Resul
         return Err("No images selected".to_string());
     }
 
+    // A4 size in mm
+    let page_w = Mm(210.0);
+    let page_h = Mm(297.0);
+
     // Create document with first page (A4)
     let (doc, page1, layer1) = PdfDocument::new(
         "Image to PDF",
-        Mm(210.0),
-        Mm(297.0),
+        page_w,
+        page_h,
         "Layer 1",
     );
 
     let mut is_first = true;
-    let mut doc = doc; // rebind as mut for add_page
+    let mut doc = doc;
 
     for path_str in &image_paths {
         let path = Path::new(path_str);
@@ -40,20 +44,27 @@ fn convert_images_to_pdf(image_paths: Vec<String>, output_path: String) -> Resul
             is_first = false;
             (page1, layer1)
         } else {
-            doc.add_page(Mm(210.0), Mm(297.0), "Layer 1")
+            doc.add_page(page_w, page_h, "Layer 1")
         };
 
         let current_layer = doc.get_page(page).get_layer(layer);
 
-        // Scale to fit A4 while preserving aspect ratio (300 DPI base)
-        let img_w_mm = (img_w as f32) * 25.4 / 300.0;
-        let img_h_mm = (img_h as f32) * 25.4 / 300.0;
-        let scale = (210.0 / img_w_mm).min(297.0 / img_h_mm).min(1.0);
+        // Fit image to the full page while preserving aspect ratio (allow upscaling)
+        // printpdf default is 300 DPI → 1 px ≈ 0.084666 mm (25.4 / 300)
+        let px_to_mm = 25.4 / 300.0;
+        let img_w_mm = img_w as f32 * px_to_mm;
+        let img_h_mm = img_h as f32 * px_to_mm;
+
+        let scale_w = page_w.0 / img_w_mm;
+        let scale_h = page_h.0 / img_h_mm;
+        let scale = scale_w.min(scale_h); // fit inside page, no .min(1.0)
 
         let scaled_w = img_w_mm * scale;
         let scaled_h = img_h_mm * scale;
-        let x = (210.0 - scaled_w) / 2.0;
-        let y = (297.0 - scaled_h) / 2.0;
+
+        // Center on page
+        let x = (page_w.0 - scaled_w) / 2.0;
+        let y = (page_h.0 - scaled_h) / 2.0;
 
         pdf_image.add_to_layer(
             current_layer,
@@ -62,6 +73,7 @@ fn convert_images_to_pdf(image_paths: Vec<String>, output_path: String) -> Resul
                 translate_y: Some(Mm(y)),
                 scale_x: Some(scale),
                 scale_y: Some(scale),
+                dpi: Some(300.0),
                 ..Default::default()
             },
         );
