@@ -2,6 +2,8 @@
 
 Tauri tabanlı basit bir masaüstü uygulaması. Birden fazla resmi seçip tek bir PDF dosyasına dönüştürür.
 
+cargo tauri build --target i686-pc-windows-msvc
+
 ## Özellikler
 
 - Çoklu resim seçimi (PNG, JPG, JPEG, GIF, BMP, WEBP, TIFF)
