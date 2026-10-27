@@ -16,7 +16,7 @@ fn convert_images_to_pdf(image_paths: Vec<String>, output_path: String) -> Resul
     let page_h = Mm(297.0);
 
     // Create document with first page (A4)
-    let (mut doc, page1, layer1) = PdfDocument::new(
+    let (doc, page1, layer1) = PdfDocument::new(
         "Image to PDF",
         page_w,
         page_h,
@@ -24,6 +24,7 @@ fn convert_images_to_pdf(image_paths: Vec<String>, output_path: String) -> Resul
     );
 
     let mut is_first = true;
+    let mut doc = doc;
 
     for path_str in &image_paths {
         let path = Path::new(path_str);
